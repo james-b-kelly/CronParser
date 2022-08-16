@@ -22,9 +22,13 @@ class Script {
         guard digits.count == 2 else {
             return nil
         }
+        let hourString = digits[0]
+        let minuteString = digits[1]
+
         guard
-            let hour = Int(digits[0]),
-            let minute = Int(digits[1]) else {
+            hourString.isNumber, minuteString.isNumber,
+            let hour = Int(hourString),
+            let minute = Int(minuteString) else {
             return nil
         }
         
@@ -129,7 +133,7 @@ class Script {
     /// - Parameter line: Line with 3 components: an hour (wildcard or int), a minute (wildcard or int), and a script name.
     /// - Returns: If hour or minute are wild card they will be returned as nil.
     func splitLine(_ line: String) -> (hour: Int?, minute: Int?, scriptName: String)? {
-        let components = line.components(separatedBy: .whitespaces)
+        let components = line.components(separatedBy: .whitespaces).filter({ $0.count > 0 })
         guard components.count == 3 else {
             print("Invalid line in input file - '\(line)'")
             return nil
@@ -138,9 +142,9 @@ class Script {
         let hour = components[1]
         let minute = components[0]
         let scriptName = components[2]
-        
-        guard hour.isNumber, minute.isNumber else {
-            print("Invalid time in input line - `\(line)`")
+
+        guard hour.isNumber || hour == wildCard, minute.isNumber || minute == wildCard else {
+            print("Invalid time in input file - `\(line)`")
             return nil
         }
         

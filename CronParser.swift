@@ -51,9 +51,13 @@ func processInputTime(_ time: String) -> (hour: Int, minute: Int)? {
     guard digits.count == 2 else {
         return nil
     }
+    let hourString = digits[0]
+    let minuteString = digits[1]
+
     guard
-        let hour = Int(digits[0]),
-        let minute = Int(digits[1]) else {
+        hourString.isNumber, minuteString.isNumber,
+        let hour = Int(hourString),
+        let minute = Int(minuteString) else {
         return nil
     }
     
@@ -81,7 +85,7 @@ func processLine(_ line: String, currentHour: Int, currentMinute: Int) -> Result
     guard let components = splitLine(line) else {
         return nil
     }
-
+    
     let nextCalledHour: Int
     let nextCalledMinute: Int
     let isToday: Bool
@@ -153,12 +157,12 @@ func processLine(_ line: String, currentHour: Int, currentMinute: Int) -> Result
                         isToday: isToday)
     return result
 }
-                                                                            
+
 /// Splits input config line into hour, minute, and script name.
 /// - Parameter line: Line with 3 components: an hour (wildcard or int), a minute (wildcard or int), and a script name.
 /// - Returns: If hour or minute are wild card they will be returned as nil.
 func splitLine(_ line: String) -> (hour: Int?, minute: Int?, scriptName: String)? {
-    let components = line.components(separatedBy: .whitespaces)
+    let components = line.components(separatedBy: .whitespaces).filter({ $0.count > 0 })
     guard components.count == 3 else {
         print("Invalid line in input file - '\(line)'")
         return nil
@@ -167,9 +171,9 @@ func splitLine(_ line: String) -> (hour: Int?, minute: Int?, scriptName: String)
     let hour = components[1]
     let minute = components[0]
     let scriptName = components[2]
-    
-    guard hour.isNumber, minute.isNumber else {
-        print("Invalid time in input line - `\(line)`")
+
+    guard hour.isNumber || hour == wildCard, minute.isNumber || minute == wildCard else {
+        print("Invalid time in input file - `\(line)`")
         return nil
     }
     
