@@ -158,7 +158,7 @@ func processLine(_ line: String, currentHour: Int, currentMinute: Int) -> Result
 /// - Parameter line: Line with 3 components: an hour (wildcard or int), a minute (wildcard or int), and a script name.
 /// - Returns: If hour or minute are wild card they will be returned as nil.
 func splitLine(_ line: String) -> (hour: Int?, minute: Int?, scriptName: String)? {
-    let components = line.components(separatedBy: " ")
+    let components = line.components(separatedBy: .whitespaces)
     guard components.count == 3 else {
         print("Invalid line in input file - '\(line)'")
         return nil
@@ -167,7 +167,19 @@ func splitLine(_ line: String) -> (hour: Int?, minute: Int?, scriptName: String)
     let hour = components[1]
     let minute = components[0]
     let scriptName = components[2]
+    
+    guard hour.isNumber, minute.isNumber else {
+        print("Invalid time in input line - `\(line)`")
+        return nil
+    }
+    
     return (hour == wildCard ? nil : Int(hour),
             minute == wildCard ? nil : Int(minute),
             scriptName)
+}
+
+extension String  {
+    var isNumber: Bool {
+        return !isEmpty && rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil
+    }
 }
